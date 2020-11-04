@@ -80,10 +80,10 @@ TEMPLATES = [
 
 # Database
 
-DATABASES = {'default': env.db()}
+# DATABASES = {'default': env.db()}
 
-# TODO: when perf becomes a bottleneck, handles transaction manually
-DATABASES['default']['ATOMIC_REQUESTS'] = True
+# # TODO: when perf becomes a bottleneck, handles transaction manually
+# DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 # Password validation
 

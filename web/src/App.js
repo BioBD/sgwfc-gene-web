@@ -1,7 +1,8 @@
 import React from 'react';
+import UploadScreen from './Components/UploadScreen/';
 
 function App() {
-  return <h1>r-sgwfc-gene-web</h1>
+  return <UploadScreen />;
 }
 
 export default App;
