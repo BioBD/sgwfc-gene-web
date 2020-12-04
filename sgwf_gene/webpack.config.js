@@ -9,6 +9,9 @@ module.exports = {
     publicPath: '/static/dist/',
     filename: "[name]-[hash].js",
   },
+  optimization: {
+    minimize: false
+  },
   plugins: [
     new BundleTracker({
       path: __dirname,

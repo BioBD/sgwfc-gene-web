@@ -4,14 +4,24 @@ import './index.less'
 
 class FileUpload extends React.Component {
 
-  onButtonClick () {
-    console.log("Hello")
+  async workflow (requestData) {
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify(requestData),
+      headers: new Headers({
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }),
+    }
+  
+    const response = await fetch('http://localhost:8000/api/workflow/', requestOptions)
+    console.log(response.json())
   }
 
   render () {
     return (
       <div className="file_upload--wrapper">
-        <Button text="Upload" height="10%" width="20%" onClickFunction={this.onButtonClick} color="grey" />
+        <Button text="Upload" height="10%" width="20%" onClickFunction={() => this.workflow({name: "Nome Documento"})} color="grey" />
       </div>
     )
   }
