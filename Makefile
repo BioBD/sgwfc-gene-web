@@ -11,6 +11,7 @@ front:
 	@npm start
 
 server:
+	@prefect backend server
 	@python manage.py runserver
 
 run: | front server

@@ -21,7 +21,7 @@ class FileUpload extends React.Component {
   render () {
     return (
       <div className="file_upload--wrapper">
-        <Button text="Upload" height="10%" width="20%" onClickFunction={() => this.workflow({name: "Nome Documento"})} color="grey" />
+        <Button text="Upload" height="10%" width="20%" onClickFunction={() => this.workflow({name: "input/STRING/yellow_interactions.csv"})} color="grey" />
       </div>
     )
   }
