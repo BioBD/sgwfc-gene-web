@@ -130,6 +130,7 @@ dmypy.json
 
 # React stuff
 node_modules/
-package-lock.json
 
+# Code and Mac
 .DS_Store
+.vscode
