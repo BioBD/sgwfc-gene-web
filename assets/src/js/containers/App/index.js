@@ -5,6 +5,7 @@ import Graph from '../../components/Graph'
 import './index.less'
 
 class App extends React.Component {
+
   render () {
     const text = 'Django + React Teste';
     return (
