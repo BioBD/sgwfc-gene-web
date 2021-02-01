@@ -26,7 +26,7 @@ SECRET_KEY = 'p%e681w*b9j5-ij0$o5*eq-7s370)h1$6prk=o^pd&m8mx92gs'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["vm014.cloud.inf.puc-rio.br:8000"]
 
 
 # Application definition
