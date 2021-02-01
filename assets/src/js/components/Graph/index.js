@@ -36,7 +36,7 @@ const Graph = () => {
       }),
     }
   
-    fetch('http://localhost:8000/api/workflow/', requestOptions)
+    fetch('/api/workflow/', requestOptions)
       .then(res => res.json())
       .then(
         (result) => {
