@@ -1,0 +1,9 @@
+{% if ENVIRONMENT == "testing" %}
+    <div class="env-container" style="background-color:#17A2B8">
+        <span class="text-white">ENVIRONMENT: <b>TESTING</b></span>
+    </div>
+{% elif ENVIRONMENT == "development" %}
+    <div class="env-container" style="background-color:#b81717">
+        <span class="text-white">ENVIRONMENT: <b>DEVELOPMENT</b></span>
+    </div>
+{% endif %}
