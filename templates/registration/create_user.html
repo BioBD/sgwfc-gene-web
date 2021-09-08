@@ -1,0 +1,104 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% if form.errors %}
+<div class="alert alert-danger" role="alert">
+    Houve um erro ao criar seu usuário. Por favor, veja as mensagens abaixo.
+</div>
+{% endif %}
+
+<div class="row justify-content-center">
+	<div class="form-group col-md-12">
+		<div class="jumbotron">
+			<legend class="text-center">
+				<h3 class="display-4">Criação de Usuário</h3>
+			</legend>
+
+			<p class="lead text-center">
+                Bem-vindo ao SGWF Gene!<br>
+                Ao criar sua conta, ela estará pendente de ativação. Você receberá um email quando ela for ativada.
+            </p>
+
+			<hr class="my-4">
+
+			<form method="post" action="{% url 'user_create' %}">
+				{% csrf_token %}
+
+				<div class="row justify-content-center">
+					<div class="form-group col-md-8">
+						{{ form.username.label_tag }}
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.username.errors }}
+                        </div>
+                        {% endif %}
+
+                        {{ form.email.label_tag }}
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.email.errors }}
+                        </div>
+                        {% endif %}
+					</div>
+                </div>
+
+				<div class="row justify-content-center">
+					<div class="form-group col-md-8">
+						{{ form.first_name.label_tag }}
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.first_name.errors }}
+                        </div>
+                        {% endif %}
+
+                        {{ form.last_name.label_tag }}
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.last_name.errors }}
+                        </div>
+                        {% endif %}
+					</div>
+                </div>
+
+				<div class="row justify-content-center">
+					<div class="form-group col-md-8">
+						{{ form.password1.label_tag }}
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.password1.errors }}
+                        </div>
+                        {% endif %}
+
+                        {{ form.password2.label_tag }}
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.password2.errors }}
+                        </div>
+                        {% endif %}
+					</div>
+                </div>
+
+				<div class="text-center">
+					<div class="form-group">
+						<div class="row justify-content-lg-center">
+							<div class="col-lg-7 col-lg-offset-3 .col-md-4">
+								<input type="submit" name="submit" value="Registrar"
+									class="btn btn-primary col-xs-8 .col-md-8" />
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
