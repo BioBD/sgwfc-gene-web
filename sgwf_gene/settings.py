@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'webpack_loader',
     'corsheaders',
-    'home'
+    'logger',
+    'home',
+    'mailer'
 ]
 
 MIDDLEWARE = [
