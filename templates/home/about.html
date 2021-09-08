@@ -1,0 +1,47 @@
+{% extends "base_generic.html" %}
+
+{% block title %}<title>Sobre</title>{% endblock %}
+
+{% block content %}
+    <p>
+        A <strong>SGWF Gene</strong> é uma ferramenta...
+        <br/><br/>
+        1) {% lorem 10 w random %}
+        2) {% lorem 10 w random %}
+        ...
+    </p>
+    <br/>
+    <h3><strong>Equipe SGWF Gene</strong></h3>
+    <p>A <strong>SGWF Gene</strong> é um projeto desenvolvido pelo laboratório <strong>BioBD</strong>, sob orientação do professor Sérgio Lifschitz (Dep. Informática) da PUC-Rio, em parceria com o aluno Cristóvão e a professora Mariana do INCA. Para contactar-nos, enviar mensagem para sergio AT inf ponto puc-rio ponto br.</p>
+    <br/>
+    <h4>Time de Desenvolvedores</h4>
+    <ul>
+        <li>Lorram N. de Oliveira <strong>(2021 - hoje)</strong></li>
+        <li>Alexandre Heine <strong>(2021 - hoje)</strong></li>
+        <li>Diogo Munaro <strong>(2020 - 2021)</strong></li>
+        <li>Cristóvão (INCA) <strong>(2019 - hpje)</strong></li>
+    </ul>
+    <br/>
+    <h3><strong>Versionamento</strong></h3>
+    <table class="table table-sm table-bordered">
+        <thead class="table-primary">
+            <tr>
+                <th>Versão</th>
+                <th>Lançada</th>
+                <th>Novidades</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0.x</td>
+                <td>Dezembro 2021</td>
+                <td>
+                    <ul>
+                        <li>Lançamento do Site para Análise de Genes</li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br><br>
+{% endblock %}

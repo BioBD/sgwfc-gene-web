@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8">
+		{% block title %}<title>SGWF-Gene</title>{% endblock %}
+		{% load static %}
+		<link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+
+		<link rel="stylesheet" href="{% static 'base/css/basic.css' %}" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css" integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+		<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+		{% block js %}{% endblock %}
+	</head>
+
+	<body>
+		<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+				aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav mr-auto" style="margin-left: 4%;">
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'home' %}">Home</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'about' %}">Sobre</a>
+					</li>
+					{% if user.is_authenticated %}
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'front-end' %}">Ferramenta</a>
+						</li>
+					{% endif %}
+				</ul>
+				{% if user.is_authenticated %}
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" id="navbar-dropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<i class="fas fa-user"></i>
+
+								Olá, <strong>{% if user.first_name == '' %}{{ user.username }}{% else %}{{ user.first_name }}{% endif %}</strong>!
+
+							</a>
+							<div class="dropdown-menu dropdown-menu-right">
+								<a href="{% url 'password_change' %}" class="dropdown-item"><i class="fas fa-key"></i> Mudar Senha</a>
+								<a href="{% url 'logout' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+								{% if user.is_staff %}
+								<div class="dropdown-divider"></div>
+								<a href="{% url 'admin:index' %}" class="dropdown-item"><i class="fas fa-user-cog"></i> Admin</a>
+								{% endif %}
+							</div>
+						</li>
+					</ul>
+				{% else %}
+					<a href="{% url 'user_create' %}" class="btn btn-outline-primary tc-btn-hover">Cadastro</a>&nbsp;
+					<a href="{% url 'login' %}" class="btn btn-outline-primary tc-btn-hover">Login</a>
+				{% endif %}
+			</div>
+		</nav>
+		{% if ENVIRONMENT == "testing" %}
+			<div class="env-container" style="background-color:#17A2B8">
+				<span class="text-white">ENVIRONMENT: <b>TESTING</b></span>
+			</div>
+		{% elif ENVIRONMENT == "development" %}
+			<div class="env-container" style="background-color:#b81717">
+				<span class="text-white">ENVIRONMENT: <b>DEVELOPMENT</b></span>
+			</div>
+		{% else %}
+			<div class="env-container"></div>
+		{% endif %}
+		<div class="container-fluid main-container">
+			<div class="row main-row">
+				<div class="col-lg-8 offset-lg-2 main-content">
+				{% block content %}{% endblock %}
+				</div>
+			</div>
+			<div class="row">
+				<div class="container-fluid footer-section">
+					<div class="container-xl">
+						<p>
+							Pontifícia Universidade Católica do Rio de Janeiro: Departamento de
+							Informática<br />
+							© 2021 BioBD PUC-Rio
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

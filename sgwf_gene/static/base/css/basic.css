@@ -1,0 +1,43 @@
+body {
+	font-family: 'Lato', sans-serif !important;
+}
+
+.footer-section {
+	background-color: #6585ee;
+	font-family: "Trebuchet MS";
+	font-size: 11px;
+	height: 70px;
+	padding-top: 2vh;
+	overflow: hidden;
+	border-top: 1px solid #c5dff0;
+}
+
+.env-container {
+	position: fixed;
+    top: 0;
+    right: 0;
+	left: 0;
+	margin-top: 95px;
+	text-align: center;
+}
+
+.main-container {
+	margin-top: 120px;
+	padding-top: 2vh;
+}
+
+.main-row {
+	padding-bottom: 1vh;
+}
+
+.main-content {
+	overflow: auto;
+	height: calc(96vh - 180px);
+}
+
+@media (max-width: 992px) {
+	.main-content {
+		overflow: auto;
+		height: calc(90vh - 180px);
+	}
+}
