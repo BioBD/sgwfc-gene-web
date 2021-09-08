@@ -2,5 +2,6 @@ django==3.1.4
 djangorestframework==3.12.2
 django-webpack-loader==0.7.0
 django_cors_headers==3.6.0
+django-mailer==2.1
 prefect==0.14.16
 simplejson==3.17.2
