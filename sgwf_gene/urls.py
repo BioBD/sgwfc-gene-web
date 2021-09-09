@@ -27,7 +27,6 @@ admin.site.site_header = 'Administração SGWF Gene'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('tool/', TemplateView.as_view(template_name='front-end/index.html'), name='front-end'),
     path('', include('home.urls')),
     path('api/', include('djangoapi.urls')),
 

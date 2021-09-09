@@ -1,21 +1,30 @@
 import time
 import simplejson
-from django.shortcuts import render
-from rest_framework import viewsets
-from rest_framework.parsers import JSONParser 
 from django.http import HttpResponse
-from rest_framework import status
-
-from .serializers import DocumentSerializer
-from .models import Document
-from rest_framework.decorators import api_view
-from prefect import Flow, task, Client
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render
+from djangoapi.serializers import DocumentSerializer
+from djangoapi.models import Document
+from prefect import Flow, Client
 from prefect.tasks.prefect import StartFlowRun
+from rest_framework import viewsets, status
+from rest_framework.decorators import api_view
+from rest_framework.parsers import JSONParser 
 
-class DocumentViewSet(viewsets.ModelViewSet):
+
+class DocumentViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
   queryset = Document.objects.all().order_by('name')
   serializer_class = DocumentSerializer
 
+
+@login_required
+def tool(request):
+    """Função da View para página Home"""
+    return render(request, 'front-end/index.html')
+
+
+@login_required
 @api_view(['POST'])
 def workflow(request):
 

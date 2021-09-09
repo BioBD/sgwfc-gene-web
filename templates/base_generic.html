@@ -74,7 +74,7 @@
 		{% endif %}
 		<div class="container-fluid main-container">
 			<div class="row main-row">
-				<div class="col-lg-8 offset-lg-2 main-content">
+				<div class="{% block content-space %} col-lg-8 offset-lg-2 {%endblock%} main-content">
 				{% block content %}{% endblock %}
 				</div>
 			</div>

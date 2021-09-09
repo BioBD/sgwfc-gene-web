@@ -102,6 +102,12 @@ WEBPACK_LOADER = {
     }
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
 WSGI_APPLICATION = 'sgwf_gene.wsgi.application'
 
 
