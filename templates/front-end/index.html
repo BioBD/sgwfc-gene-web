@@ -1,6 +1,9 @@
 {% extends "base_generic.html" %}
 {% load render_bundle from webpack_loader %}
 {% block js %}
+    <script>
+        csrf_token = "{{ csrf_token }}";
+    </script>
     {% render_bundle 'main' 'css' %}
 {% endblock %}
 {% block content-space %}{%endblock%}

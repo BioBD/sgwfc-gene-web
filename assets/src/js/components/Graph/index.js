@@ -32,7 +32,8 @@ const Graph = () => {
       body: JSON.stringify(requestData),
       headers: new Headers({
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'X-CSRFToken': csrf_token
       }),
     }
   
