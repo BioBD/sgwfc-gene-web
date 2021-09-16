@@ -1,4 +1,7 @@
 import time
+import os
+import re
+from django.views.decorators.csrf import csrf_exempt
 import simplejson
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -12,17 +15,75 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser 
 
+PATH_CURRENT = os.getcwd()
 
 class DocumentViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
   queryset = Document.objects.all().order_by('name')
   serializer_class = DocumentSerializer
-
 
 @login_required
 def tool(request):
     """Função da View para página Home"""
     return render(request, 'front-end/index.html')
 
+@login_required
+@api_view(['POST'])
+def uploadFile(request):
+  
+  error = True
+  if 'csv' in request.FILES:
+
+        document = request.FILES.getlist('csv')[0]
+
+        try:         
+            cont = 1
+            columnsValidation = ["SUID","coexpression","cooccurrence","databases","experiments","fusion","interaction","interspecies","name","neighborhood","score","selected","shared interaction","shared name","textmining"]
+            for chunk in document.chunks():
+              words = str(chunk).split(',')
+              for word in words:
+                word =  re.sub(r'\b[a-zA-Z]\b', '', word)
+                word =  re.sub(r'[0-9]', '', word)
+                word = word.replace("\'",'').replace('\"','').replace('\\','')
+                if word in columnsValidation:
+                  cont = cont+1
+             
+            if cont != 16:
+
+              return HttpResponse(
+                simplejson.dumps({'error': error, 'message': 'There are invalid or missing columns in the CSV file.'}),
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                content_type="application/json"
+              )
+
+            else:
+                        
+              path = os.path.join(PATH_CURRENT, 'documents', document.name)
+
+              with open(path, 'wb+') as destination:
+                  for chunk in document.chunks():
+                     destination.write(chunk)  
+
+              error = False
+
+              return HttpResponse(
+                  simplejson.dumps({'error': error}),
+                  status=status.HTTP_200_OK,
+                  content_type="application/json"
+              )
+
+        except Exception:
+
+            return HttpResponse(
+                simplejson.dumps({'error': error, 'message':'Error saving CSV file.'}),
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                content_type="application/json"
+            )
+  else:
+        return HttpResponse(
+                simplejson.dumps({'error': error, 'message':'Invalid input CSV file.'}),
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                content_type="application/json"
+        )
 
 @login_required
 @api_view(['POST'])
