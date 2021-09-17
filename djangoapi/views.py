@@ -37,14 +37,14 @@ def uploadFile(request):
 
         try:         
             cont = 1
-            columnsValidation = ["SUID","coexpression","cooccurrence","databases","experiments","fusion","interaction","interspecies","name","neighborhood","score","selected","shared interaction","shared name","textmining"]
-            for chunk in document.chunks():
-              words = str(chunk).split(',')
-              for word in words:
+            columnsValidation = ["SUID","COEXPRESSION","COOCCURRENCE","DATABASES","EXPERIMENTS","FUSION","INTERACTION","INTERSPECIES","NAME","NEIGHBORHOOD","SCORE","SELECTED","SHARED INTERACTION","SHARED NAME","TEXTMINING"]
+            chunk = document.read(200) 
+            words = str(chunk).split(',')
+            for word in words:
                 word =  re.sub(r'\b[a-zA-Z]\b', '', word)
                 word =  re.sub(r'[0-9]', '', word)
                 word = word.replace("\'",'').replace('\"','').replace('\\','')
-                if word in columnsValidation:
+                if word.upper() in columnsValidation:
                   cont = cont+1
              
             if cont != 16:
