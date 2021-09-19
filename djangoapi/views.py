@@ -1,6 +1,7 @@
 import time
 import os
 import re
+import uuid
 from django.views.decorators.csrf import csrf_exempt
 import simplejson
 from django.http import HttpResponse
@@ -14,12 +15,13 @@ from prefect.tasks.prefect import StartFlowRun
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser 
+from django.contrib.auth.models import User
 
 PATH_CURRENT = os.getcwd()
 
-class DocumentViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
+'''class DocumentViewSet(viewsets.ModelViewSet, LoginRequiredMixin):
   queryset = Document.objects.all().order_by('name')
-  serializer_class = DocumentSerializer
+  serializer_class = DocumentSerializer'''
 
 @login_required
 def tool(request):
@@ -29,7 +31,7 @@ def tool(request):
 @login_required
 @api_view(['POST'])
 def uploadFile(request):
-  
+
   error = True
   if 'csv' in request.FILES:
 
@@ -56,20 +58,14 @@ def uploadFile(request):
               )
 
             else:
-                        
-              path = os.path.join(PATH_CURRENT, 'documents', document.name)
+
+              token = uuid.uuid4().hex[:14]
+              name_file = token+'token_'+document.name
+              path = os.path.join(PATH_CURRENT, 'documents', name_file)
 
               with open(path, 'wb+') as destination:
                   for chunk in document.chunks():
-                     destination.write(chunk)  
-
-              error = False
-
-              return HttpResponse(
-                  simplejson.dumps({'error': error}),
-                  status=status.HTTP_200_OK,
-                  content_type="application/json"
-              )
+                     destination.write(chunk)                     
 
         except Exception:
 
@@ -78,6 +74,24 @@ def uploadFile(request):
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 content_type="application/json"
             )
+
+        user = User.objects.get(id=request.user.id)        
+        document = Document(name=name_file, path=path, user=user)
+        document.save()
+
+        # name = models.CharField(max_length=80)
+        #path = models.CharField(max_length=200)  
+        #uploaded_at = models.DateTimeField(auto_now_add=True)
+        #user = models.ForeignKey(User)
+        #document.name = name_file
+
+        error = False
+        return HttpResponse(
+                  simplejson.dumps({'error': error}),
+                  status=status.HTTP_200_OK,
+                  content_type="application/json"
+        )
+
   else:
         return HttpResponse(
                 simplejson.dumps({'error': error, 'message':'Invalid input CSV file.'}),
@@ -88,7 +102,7 @@ def uploadFile(request):
 @login_required
 @api_view(['POST'])
 def workflow(request):
-
+  
   document = JSONParser().parse(request)
   graph_building = StartFlowRun(
     flow_name="graph_building",
