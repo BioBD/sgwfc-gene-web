@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './index.less'
 import CytoscapeComponent from 'react-cytoscapejs'
+import Util from '../../util'
 
 const Graph = () => {
   const [error, setError] = useState(null);
@@ -25,6 +26,8 @@ const Graph = () => {
   ]
   const style = { width: '800px', height: '800px' }
 
+  const csrftoken = Util.getCookie('csrftoken');
+
   useEffect(() => {
     const requestData = {name: "input/STRING/yellow_interactions.csv"};
     const requestOptions = {
@@ -33,7 +36,7 @@ const Graph = () => {
       headers: new Headers({
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'X-CSRFToken': csrf_token
+        'X-CSRFToken': csrftoken
       }),
     }
   
