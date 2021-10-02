@@ -14,7 +14,19 @@ const Util  = {
             }
         }
         return cookieValue;
-    }
+    },
+
+    verificaExtensao(input, extensoes) {
+        
+        var extPermitidas = extensoes;
+        var extArquivo = input.split('.').pop();
+      
+        if(typeof extPermitidas.find(function(ext){ return extArquivo == ext; }) == 'undefined') {
+          return false;
+        } else {
+          return true;
+        }
+      }
     
 }
 export default Util
