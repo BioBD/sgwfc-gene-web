@@ -144,8 +144,8 @@ const layout =  {
           setItems(result);
           const r = {};
           
-          r['edges']= result['edges'].splice(0,2000);
-          r['nodes'] = result['nodes'].splice(0, 2001);
+          r['edges']= result['edges'].splice(0,1500);
+          r['nodes'] = result['nodes'].splice(0, 1501);
           setr(r);        
         },
         (error) => {
@@ -164,7 +164,7 @@ const layout =  {
   } else {
     return (
       <div className="graph--wrapper">
-        <CytoscapeComponent elements={CytoscapeComponent.normalizeElements(r)} minZoom={0.8} zoom={0.3} maxZoom={2.5} layout={layout} stylesheet={stylesheet} style={style} />                              
+        <CytoscapeComponent elements={CytoscapeComponent.normalizeElements(r)} minZoom={0.2} zoom={0.8} maxZoom={1.5} layout={layout} stylesheet={stylesheet} style={style} />                              
       </div>
     )
   
