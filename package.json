@@ -28,7 +28,8 @@
     "webpack-cli": "^4.2.0"
   },
   "dependencies": {
-    "cytoscape": "^3.17.0",
+    "cytoscape": "^3.19.1",
+    "cytoscape-fcose": "^2.1.0",
     "less": "^3.12.2",
     "less-loader": "^5.0.0",
     "react": "^17.0.1",
