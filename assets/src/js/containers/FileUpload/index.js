@@ -13,6 +13,14 @@ const FileUpload = () => {
     const fileUploadHandler = event => {
     
       const file = event.target.files[0];
+
+      if(!Util.verificaExtensao(file.name, ['csv']))
+      {
+        alert('File with invalid extension. Enter a valid csv file.');
+        document.getElementById('uploadFileCSV').value = "";
+        return;
+      }
+
       const formaData = new FormData();
       formaData.append('csv', file);
             
@@ -52,7 +60,7 @@ const FileUpload = () => {
       //<Button text="Upload" height="10%" width="20%" color="grey" />
       return (
         <div className="file_upload--wrapper">
-        <input type="file" onChange={fileUploadHandler} />
+        <input type="file" id="uploadFileCSV" onChange={fileUploadHandler} />
         </div>
       )
     }

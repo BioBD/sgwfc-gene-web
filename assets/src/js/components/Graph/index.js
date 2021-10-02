@@ -24,9 +24,15 @@ const Graph = () => {
       }
     }
   ]
-  const style = { width: '800px', height: '800px' }
+  const style =  { background: 'white', width: '90%', height: '950px', border:'2px solid #808080', borderRadius:'5px' }
 
   const csrftoken = Util.getCookie('csrftoken');
+
+  const elements = [
+    { data: { id: 'one', label: 'Node 1' }, position: { x: 100, y: 100 } },
+    { data: { id: 'two', label: 'Node 2' }, position: { x: 200, y: 300 } },
+    { data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' } }
+  ];
 
   useEffect(() => {
     const requestData = {name: "input/STRING/yellow_interactions.csv"};
@@ -35,9 +41,8 @@ const Graph = () => {
       body: JSON.stringify(requestData),
       headers: new Headers({
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
         'X-CSRFToken': csrftoken
-      }),
+      })
     }
   
     fetch('/api/workflow/', requestOptions)
@@ -53,16 +58,15 @@ const Graph = () => {
         }
       )
   }, [])
+//
+//<CytoscapeComponent elements={elements}  style={ } />          
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else if (!isLoaded) {
-    return <div>Loading...</div>;
-  } else {
-    return (
-      <CytoscapeComponent elements={CytoscapeComponent.normalizeElements(items)} zoom={0.5} layout={layout} stylesheet={stylesheet} style={style} />
-    )
-  }
+  return (
+    <div className="graph--wrapper">
+      <CytoscapeComponent elements={CytoscapeComponent.normalizeElements(items)} minZoom={0.8} zoom={1.5} maxZoom={2.5} layout={layout} stylesheet={stylesheet} style={style} />              
+    </div>
+  )
+  
 
 }
 export default Graph

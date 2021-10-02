@@ -1,7 +1,7 @@
 import time
 import os
-import re
 import uuid
+import csv
 from django.views.decorators.csrf import csrf_exempt
 import simplejson
 from django.http import HttpResponse
@@ -16,6 +16,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser 
 from django.contrib.auth.models import User
+import pickle
+import networkx
 
 PATH_CURRENT = os.getcwd()
 
@@ -34,56 +36,28 @@ def uploadFile(request):
 
   error = True
   if 'csv' in request.FILES:
+      fileCSV = request.FILES.getlist('csv')[0]
 
-        document = request.FILES.getlist('csv')[0]
-
+      if fileCSV.name.lower().endswith('.csv'):
         try:         
-            cont = 1
-            columnsValidation = ["SUID","COEXPRESSION","COOCCURRENCE","DATABASES","EXPERIMENTS","FUSION","INTERACTION","INTERSPECIES","NAME","NEIGHBORHOOD","SCORE","SELECTED","SHARED INTERACTION","SHARED NAME","TEXTMINING"]
-            chunk = document.read(200) 
-            words = str(chunk).split(',')
-            for word in words:
-                word =  re.sub(r'\b[a-zA-Z]\b', '', word)
-                word =  re.sub(r'[0-9]', '', word)
-                word = word.replace("\'",'').replace('\"','').replace('\\','')
-                if word.upper() in columnsValidation:
-                  cont = cont+1
-             
-            if cont != 16:
+            token = uuid.uuid4().hex[:14]
+            name_file = token+'token_'+fileCSV.name
+            path = os.path.join(PATH_CURRENT, 'documents', name_file)
 
-              return HttpResponse(
-                simplejson.dumps({'error': error, 'message': 'There are invalid or missing columns in the CSV file.'}),
-                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                content_type="application/json"
-              )
-
-            else:
-
-              token = uuid.uuid4().hex[:14]
-              name_file = token+'token_'+document.name
-              path = os.path.join(PATH_CURRENT, 'documents', name_file)
-
-              with open(path, 'wb+') as destination:
-                  for chunk in document.chunks():
+            with open(path, 'wb+') as destination:
+                  for chunk in fileCSV.chunks():
                      destination.write(chunk)                     
 
-        except Exception:
+            user = User.objects.get(id=request.user.id)        
+            document = Document(name=name_file, path=path, user=user)
+            document.save()
 
+        except Exception:
             return HttpResponse(
                 simplejson.dumps({'error': error, 'message':'Error saving CSV file.'}),
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 content_type="application/json"
             )
-
-        user = User.objects.get(id=request.user.id)        
-        document = Document(name=name_file, path=path, user=user)
-        document.save()
-
-        # name = models.CharField(max_length=80)
-        #path = models.CharField(max_length=200)  
-        #uploaded_at = models.DateTimeField(auto_now_add=True)
-        #user = models.ForeignKey(User)
-        #document.name = name_file
 
         error = False
         return HttpResponse(
@@ -91,26 +65,27 @@ def uploadFile(request):
                   status=status.HTTP_200_OK,
                   content_type="application/json"
         )
-
-  else:
-        return HttpResponse(
+ 
+  return HttpResponse(
                 simplejson.dumps({'error': error, 'message':'Invalid input CSV file.'}),
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 content_type="application/json"
-        )
+  )
 
 @login_required
 @api_view(['POST'])
 def workflow(request):
   
-  document = JSONParser().parse(request)
+  '''print(request)
+  #document = JSONParser().parse(request)
+  
   graph_building = StartFlowRun(
     flow_name="graph_building",
     project_name="sgwfc-gene",
     wait=False
   )
   with Flow("Call Flow") as flow:
-    end_flow = graph_building(parameters=dict(gene_filename=document["name"]))
+    end_flow = graph_building(parameters=dict(gene_filename='/input/base_wgcna.csv'))
   state = flow.run()
   flow_id = state.result[end_flow].result
   client = Client()
@@ -120,8 +95,24 @@ def workflow(request):
   info = client.get_flow_run_info(flow_id)
   last_task = info.task_runs.pop()
   graph = last_task.state.load_result(last_task.state._result).result
+  
+  '''
+
+  g = pickle.load(open('file.pkl','rb'))
+  G = networkx.path_graph(g)
+  graph = networkx.cytoscape_data(G)
+
   return HttpResponse(
-    simplejson.dumps(graph["elements"], ignore_nan=True),
+    simplejson.dumps(graph['elements'], ignore_nan=True),    
     status=status.HTTP_201_CREATED,
     content_type="application/json"
   )
+
+  
+  '''
+  return HttpResponse(
+    simplejson.dumps(graph['elements'], ignore_nan=True),    
+    status=status.HTTP_201_CREATED,
+    content_type="application/json"
+  )'''
+
