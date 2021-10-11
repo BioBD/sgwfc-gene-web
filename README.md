@@ -26,6 +26,11 @@ Inside Python 3.5+ virtualenv
 make install
 ```
 
+### Create admin user
+```
+make admin
+```
+
 ### DB migrations
 
 ```
