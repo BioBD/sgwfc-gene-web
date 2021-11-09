@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
-from djangoapi.views import  workflow, tool, uploadFile
+from djangoapi.views import  workflow, tool, uploadFile, getFilesUser, deleteFileUser
 
 router = routers.DefaultRouter()
 
@@ -9,5 +9,7 @@ urlpatterns = [
     path('uploadFile/', uploadFile),
     path('tool/', tool, name='front-end'),
     path('workflow/', workflow),
+    path('getFilesUser/', getFilesUser),
+    path('deleteFileUser/', deleteFileUser),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

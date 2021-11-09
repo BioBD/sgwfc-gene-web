@@ -4,15 +4,63 @@ import CytoscapeComponent from 'react-cytoscapejs'
 import Util from '../../util'
 import Cytoscape from 'cytoscape';
 import fcose from 'cytoscape-fcose';
+import {useSelector} from 'react-redux' 
+import Loader from "react-loader-spinner";
+
 Cytoscape.use(fcose);
 
 const Graph = () => {
   const [error, setError] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(true);
+  const [runFinished, setRunFinished] = useState(false);
   const [items, setItems] = useState([]);
   const [r, setr] = useState([]);
+  
+  const tokenFile = useSelector((state) => state.tokenFile);
+  
+  useEffect(() => {    
+    if(tokenFile)
+    {
+      setRunFinished(false);
+      setIsLoaded(false);
 
-const layout =  {
+      const requestData = {tokenFile: tokenFile};
+      const csrftoken = Util.getCookie('csrftoken');
+      
+      const requestOptions = {
+        method: 'POST',
+        body: JSON.stringify(requestData),
+        headers: new Headers({
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      })
+    }
+
+    fetch('/api/workflow/', requestOptions)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          setIsLoaded(true);
+          setItems(result);
+          const r = {};
+          
+          r['edges']= result['edges'].splice(0,500);
+          r['nodes'] = result['nodes'].splice(0, 501);
+          
+          setr(r);              
+          setRunFinished(true);
+          setIsLoaded(true);
+        },
+        (error) => {
+          setRunFinished(true);
+          setIsLoaded(true);
+          setError(error);
+        }
+      )
+    }
+  },[tokenFile])
+
+    const layout =  {
       name: 'fcose',
 
       // 'draft', 'default' or 'proof'
@@ -115,16 +163,19 @@ const layout =  {
       }
     }
   ]
-  const style =  { background: 'white', width: '90%', height: '800px', border:'2px solid #808080', borderRadius:'5px' }
-
-  const csrftoken = Util.getCookie('csrftoken');
+  const style =  { background: 'white', width: '90%', height: '800px', border:'2px solid #808080', borderRadius:'5px' };
 
   const elements = [
     { data: { id: 'one', label: 'Node 1' }},
     { data: { id: 'two', label: 'Node 2' }},
     { data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' } }
   ];
-  
+      
+  const runWorkflow = (tokenFile) => {    
+   
+  }
+
+  /*
   useEffect(() => {
     const requestData = {name: "input/STRING/yellow_interactions.csv"};
     const requestOptions = {
@@ -144,8 +195,9 @@ const layout =  {
           setItems(result);
           const r = {};
           
-          r['edges']= result['edges'].splice(0,1500);
-          r['nodes'] = result['nodes'].splice(0, 1501);
+          r['edges']= result['edges'].splice(0,500);
+          r['nodes'] = result['nodes'].splice(0, 501);
+          
           setr(r);        
         },
         (error) => {
@@ -154,22 +206,23 @@ const layout =  {
         }
       )
   }, [])
-  //
+  //*/
   //  <CytoscapeComponent elements={elements} zoom={1}  style={style} layout={layout} />  
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else if (!isLoaded) {
-    return <div>Loading...</div>;
-  } else {
+  if (runFinished) {
     return (
       <div className="graph--wrapper">
         <CytoscapeComponent elements={CytoscapeComponent.normalizeElements(r)} minZoom={0.2} zoom={0.8} maxZoom={1.5} layout={layout} stylesheet={stylesheet} style={style} />                              
       </div>
     )
-  
   }
-
-
+  else {
+    if(isLoaded)
+    {
+      return <div> </div>;
+    }
+    else {
+      return <Loader type="Puff" color="#00BFFF" height={100} width={100} />; //3 secs/>
+    }    
+  }
 }
 export default Graph
