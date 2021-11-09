@@ -10,7 +10,7 @@ class LogAdmin(admin.ModelAdmin):
         if obj.user is None:
             return '-'
 
-        link = reverse("admin:project_usuario_change", args=[obj.user.id])
+        link = reverse("admin:auth_user_change", args=[obj.user.id])
         return format_html('<a href="{}">{}</a>', link, obj.user.username)
 
     link_to_user.short_description = 'user'

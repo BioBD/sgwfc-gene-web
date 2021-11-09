@@ -4,6 +4,9 @@ install:
 	@pip install -r requirements.txt
 	@npm install
 
+admin:
+	@python manage.py createsuperuser
+
 migrate:
 	@python manage.py migrate
 
