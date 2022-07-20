@@ -17,86 +17,52 @@ const FilesUser = () => {
     //$('.filesUser--wrapper').hide();
     var id = $(event.target).closest('tr').attr('data-key');
     dispatch({type:'RUN', value:id})
-
+    console.log(id);
     //alert(id);
     //passar id para uma funcao do componente do cytoscape. Lá ele vai receber o id fazer uma request para o back e pegar o arquivo e rodar o workflow e mostrar o resultado na tela
   }
 
-  const deleteFile= (event) => {
-     var id = $(event.target).closest('tr').attr('data-key');
-     alert(id);
+  const deleteFile = (event) => {
+    var table_row = $(event.target).closest('tr');
+    var id = table_row.attr('data-key');
+    var index = table_row.attr('data-index');
+    console.log(id);
+    console.log(index)
 
-     const requestOptions = {
+    const requestOptions = {
       method: 'GET',
       headers: new Headers({
         'Content-Type': 'application/json',
         'X-CSRFToken': csrftoken
       })
     }
-    /*fetch('/api/deleteFileUser?id='+id, requestOptions)
+
+    fetch('/api/deleteFileUser?id=' + id, requestOptions)
       .then(res => res.json())
       .then(
         (result) => {
-          if(result.error)
-          {
-            alert('Erro ao deleter arquivo!');
-          }
-          else 
-          {
-            //apagar elemento da tabela!
-          }
+          const rows = [...files]
+          rows.splice(index, 1);
+          setFiles(rows);
         },
         (error) => {
-          setIsLoaded(true);
           setError(error);
         }
-      )     */
+      )
   }
-  /*
-  const data = React.useMemo(
-    () => [
-      {
-        col1: 'Hello',
-        col2: 'World',
-      },
-      {
-        col1: 'react-table',
-        col2: 'rocks',
-      },
-      {
-        col1: 'whatever',
-        col2: 'you want',
-      },
-    ],
-    []
-  )
 
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: 'Name',
-        accessor: 'col1', // accessor is the "key" in the data
-      },
-      {
-        Header: '	Upload date',
-        accessor: 'col2',
-      },
-      {
-        Header: '',
-        accessor: 'col2',
-      }
-    ],
-    []
-  )
-  
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable({ columns, data })
-  */
+  const downloadResult = (event) => {
+    var id = $(event.target).closest('tr').attr('data-key');
+    alert(id);
+
+    const requestOptions = {
+     method: 'GET',
+     headers: new Headers({
+       'Content-Type': 'application/json',
+       'X-CSRFToken': csrftoken
+     })
+   }
+  }
 
   useEffect(() => {
     const requestOptions = {
@@ -120,7 +86,6 @@ const FilesUser = () => {
       )
   }, [])
 
-  //<CytoscapeComponent elements={CytoscapeComponent.normalizeElements(r)} minZoom={0.2} zoom={0.8} maxZoom={1.5} layout={layout} stylesheet={stylesheet} style={style} />                  
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
@@ -135,16 +100,19 @@ const FilesUser = () => {
           <tr>
             <th>Name</th>
             <th>Upload date</th>
+            <th colspan="2">Actions</th>
+            <th>Result</th>
           </tr>
         </thead>
         <tbody>
           { 
-           files.map(item => (
-            <tr data-key={item.id}>
+           files.map((item, index) => (
+            <tr data-key={item.id} data-index={index}>
               <td>{item.name}</td>
               <td>{item.date_upload}</td>
               <td><a href="#" onClick={runWorkflow}>Run</a></td>
-              <td><a href="#" onClick={deleteFile}>Delete</a></td>              
+              <td><a href="#" onClick={deleteFile}>Delete</a></td>
+              <td><a href="#" onClick={downloadResult}>Download</a></td>
             </tr>
           ))}
         </tbody>
