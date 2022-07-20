@@ -18,7 +18,7 @@ class App extends React.Component {
           <Header title={text} />
           <FileUpload />
           <FilesUser />
-          <Graph />
+          {/* <Graph /> */}
        </Provider>
       </div>
     )

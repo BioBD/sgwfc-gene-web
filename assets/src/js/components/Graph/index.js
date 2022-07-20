@@ -31,36 +31,36 @@ const Graph = () => {
         method: 'POST',
         body: JSON.stringify(requestData),
         headers: new Headers({
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken
-      })
-    }
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken
+        })
+      }
 
-    fetch('/api/workflow/', requestOptions)
-      .then(res => res.json())
-      .then(
-        (result) => {
-          setIsLoaded(true);
-          setItems(result);
-          const r = {};
-          
-          r['edges']= result['edges'].splice(0,500);
-          r['nodes'] = result['nodes'].splice(0, 501);
-          
-          setr(r);              
-          setRunFinished(true);
-          setIsLoaded(true);
-        },
-        (error) => {
-          setRunFinished(true);
-          setIsLoaded(true);
-          setError(error);
-        }
-      )
+      fetch('/api/workflow/', requestOptions)
+        .then(res => res.json())
+        .then(
+          (result) => {
+            setIsLoaded(true);
+            setItems(result);
+            const r = {};
+            
+            r['edges']= result['edges'].splice(0,500);
+            r['nodes'] = result['nodes'].splice(0, 501);
+            
+            setr(r);              
+            setRunFinished(true);
+            setIsLoaded(true);
+          },
+          (error) => {
+            setRunFinished(true);
+            setIsLoaded(true);
+            setError(error);
+          }
+        )
     }
   },[tokenFile])
 
-    const layout =  {
+  const layout = {
       name: 'fcose',
 
       // 'draft', 'default' or 'proof'
