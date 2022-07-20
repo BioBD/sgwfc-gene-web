@@ -56,12 +56,12 @@ const FilesUser = () => {
     alert(id);
 
     const requestOptions = {
-     method: 'GET',
-     headers: new Headers({
-       'Content-Type': 'application/json',
-       'X-CSRFToken': csrftoken
-     })
-   }
+      method: 'GET',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      })
+    }
   }
 
   useEffect(() => {
@@ -106,15 +106,16 @@ const FilesUser = () => {
         </thead>
         <tbody>
           { 
-           files.map((item, index) => (
-            <tr data-key={item.id} data-index={index}>
-              <td>{item.name}</td>
-              <td>{item.date_upload}</td>
-              <td><a href="#" onClick={runWorkflow}>Run</a></td>
-              <td><a href="#" onClick={deleteFile}>Delete</a></td>
-              <td><a href="#" onClick={downloadResult}>Download</a></td>
-            </tr>
-          ))}
+            files.map((item, index) => (
+              <tr data-key={item.id} data-index={index}>
+                <td>{item.name}</td>
+                <td>{item.date_upload}</td>
+                <td><a href="#" onClick={runWorkflow}>Run</a></td>
+                <td><a href="#" onClick={deleteFile}>Delete</a></td>
+                <td><a href="#" onClick={downloadResult}>Download</a></td>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
       </div>
