@@ -1,12 +1,9 @@
 import time
 import os
 import uuid
-import csv
-from django.views.decorators.csrf import csrf_exempt
 import simplejson
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from djangoapi.serializers import DocumentSerializer
 from djangoapi.models import Document
@@ -41,20 +38,20 @@ def uploadFile(request):
       if fileCSV.name.lower().endswith('.csv'):
         try:         
             token = uuid.uuid4().hex[:14]
-            name_file = token+'token_'+fileCSV.name
+            name_file = token + 'token_' + fileCSV.name
             path = os.path.join(PATH_CURRENT, 'documents', name_file)
 
             with open(path, 'wb+') as destination:
                   for chunk in fileCSV.chunks():
-                     destination.write(chunk)                     
+                     destination.write(chunk)
 
-            user = User.objects.get(id=request.user.id)        
+            user = User.objects.get(id=request.user.id)
             document = Document(name=name_file, path=path, user=user)
             document.save()
 
         except Exception:
             return HttpResponse(
-                simplejson.dumps({'error': error, 'message':'Error saving CSV file.'}),
+                simplejson.dumps({'error': error, 'message': 'Error saving CSV file.'}),
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 content_type="application/json"
             )
@@ -67,7 +64,7 @@ def uploadFile(request):
         )
  
   return HttpResponse(
-                simplejson.dumps({'error': error, 'message':'Invalid input CSV file.'}),
+                simplejson.dumps({'error': error, 'message': 'Invalid input CSV file.'}),
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 content_type="application/json"
   )
@@ -75,10 +72,11 @@ def uploadFile(request):
 @login_required
 @api_view(['POST'])
 def workflow(request):
-  
-  '''print(request)
-  #document = JSONParser().parse(request)
-  
+
+  # print(request)
+  # document = JSONParser().parse(request)
+
+  '''
   graph_building = StartFlowRun(
     flow_name="graph_building",
     project_name="sgwfc-gene",
@@ -95,24 +93,13 @@ def workflow(request):
   info = client.get_flow_run_info(flow_id)
   last_task = info.task_runs.pop()
   graph = last_task.state.load_result(last_task.state._result).result
-  
   '''
-
   g = pickle.load(open('file.pkl','rb'))
   G = networkx.path_graph(g)
   graph = networkx.cytoscape_data(G)
 
   return HttpResponse(
-    simplejson.dumps(graph['elements'], ignore_nan=True),    
+    simplejson.dumps(graph['elements'], ignore_nan=True),
     status=status.HTTP_201_CREATED,
     content_type="application/json"
   )
-
-  
-  '''
-  return HttpResponse(
-    simplejson.dumps(graph['elements'], ignore_nan=True),    
-    status=status.HTTP_201_CREATED,
-    content_type="application/json"
-  )'''
-
