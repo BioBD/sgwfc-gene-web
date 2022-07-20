@@ -16,7 +16,7 @@ module.exports = {
     new BundleTracker({
       path: __dirname,
       filename: 'webpack-stats.json'
-    }),
+    })
   ],
   module: {
     rules: [
@@ -26,7 +26,8 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['es2015', 'react']
+            presets: ['es2015', 'react'],
+            plugins: ['babel-plugin-transform-object-rest-spread']
           }
         }
       },
