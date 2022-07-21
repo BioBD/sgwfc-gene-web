@@ -123,10 +123,12 @@ def downloadResult(request):
 
     if os.path.exists(file.result_path):
         with open(file.result_path, 'rb') as rp:
-            response = HttpResponse(rp.read(), content_type='application/x-zip-compressed')
-            response['Content-Disposition'] = f'inline; filename=result_{file.id}'
+            response = HttpResponse(rp.read())
+            response['Content-Type'] = 'application/x-zip-compressed'
+            response['Content-Disposition'] = 'attachment; filename=result_' + str(file.id) + '.zip'
+            print('ENVIOU')
             return response
-    
+
     return HttpResponseNotFound()
 
 

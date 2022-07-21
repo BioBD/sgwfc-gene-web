@@ -70,30 +70,6 @@ const FilesUser = () => {
       )
   }
 
-  const downloadResult = (event) => {
-    var id = $(event.target).closest('tr').attr('data-key');
-    alert(id);
-
-    const requestOptions = {
-      method: 'GET',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken
-      })
-    }
-
-    console.log('Downloading result from file: ' + id);
-    fetch('/api/downloadResult?id=' + id, requestOptions)
-      .then(res => res.json())
-      .then(
-        (result) => {
-          console.log('Download complete');
-        },
-        (error) => {
-          setError(error);
-        }
-      )
-  }
 
   useEffect(() => {
     const requestOptions = {
@@ -144,7 +120,7 @@ const FilesUser = () => {
                 <td><a href="#" onClick={runWorkflow}>Run</a></td>
                 <td><a href="#" onClick={deleteFile}>Delete</a></td>
                 <td>{ item.has_result &&
-                  <a href="#" onClick={downloadResult}>Download</a>
+                  <a href={"/api/downloadResult?id=" + item.id} target="_blank" rel="noopener noreferrer">Download</a>
                 }</td>
               </tr>
             ))
