@@ -136,7 +136,7 @@ def downloadResult(request):
 @api_view(['POST'])
 def workflow(request):
     # obtém o arquivo pelo id
-    file_id = int(request.POST.get('id'))
+    file_id = int(request.data.get('id'))
     file = Document.objects.filter(id=file_id).first()
     print(file_id)
     # print(request)
