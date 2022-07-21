@@ -9,7 +9,6 @@ const FilesUser = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [files, setFiles] = useState([]);
   const csrftoken = Util.getCookie('csrftoken');
-  const dispatch = useDispatch()
 
   const runWorkflow = (event) => {
     //$('.filesUser--wrapper').hide();

@@ -5,17 +5,18 @@ import simplejson
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from djangoapi.serializers import DocumentSerializer
+# from djangoapi.serializers import DocumentSerializer
 from djangoapi.models import Document
 from prefect import Flow, Client
 from prefect.tasks.prefect import StartFlowRun
-from rest_framework import viewsets, status
+from rest_framework import status  # , viewsets
 from rest_framework.decorators import api_view
-from rest_framework.parsers import JSONParser 
+# from rest_framework.parsers import JSONParser 
 from django.contrib.auth.models import User
-import pickle
-import networkx
-import datetime
+from zipfile import ZipFile
+# import pickle
+# import networkx
+# import datetime
 
 PATH_CURRENT = os.getcwd()
 
@@ -126,7 +127,6 @@ def downloadResult(request):
             response = HttpResponse(rp.read())
             response['Content-Type'] = 'application/x-zip-compressed'
             response['Content-Disposition'] = 'attachment; filename=result_' + str(file.id) + '.zip'
-            print('ENVIOU')
             return response
 
     return HttpResponseNotFound()
@@ -164,25 +164,43 @@ def workflow(request):
     # obtém o resultado da execução do workflow
     info = client.get_flow_run_info(flow_id)
     last_task = info.task_runs.pop()
-    graph = last_task.state.load_result(last_task.state._result).result
-    # breakpoint()
+    json_cyto_graphs = last_task.state.load_result(last_task.state._result).result
 
-    
-    print(dir(graph))
+    print(dir(json_cyto_graphs))
+    print(len(json_cyto_graphs))
 
-    # salva o resultado
+    # salva o resultado em arquivos separados
+    file_paths = []
+    for (index, graph) in enumerate(json_cyto_graphs):
+        path = os.path.join(PATH_CURRENT, 'results', f'result_{file_id}_{index}.cyjs')
+        with open(path, 'wb+') as destination:
+            destination.write(graph)
+        file_paths.append(path)
+
+    # cria um zip dos arquivos e remove os arquivos criados
+    zip_path = os.path.join(PATH_CURRENT, 'results', f'result_{file_id}.zip')
+    zip_file = ZipFile(zip_path, 'w')
+    for file_path in file_paths:
+        zip_file.write(file_path)
+        os.remove(file_path)
+    zip_file.close()
+
+    # salva a path do resultado no banco
+    file.result_path = zip_path
+
+    # retorna uma resposta indicando que os arquivos estão disponíveis
+    return HttpResponse(
+        simplejson.dumps({}),
+        status=status.HTTP_201_CREATED,
+        content_type="application/json"
+    )
+
     # g = pickle.load(open('file.pkl','rb'))
     # G = networkx.path_graph(g)
     # graph = networkx.cytoscape_data(G)
 
     # bb = networkx.betweenness_centrality(G)
     # networkx.set_node_attributes(G, bb, "betweenness")
-
-    return HttpResponse(
-        simplejson.dumps(graph['elements'], ignore_nan=True),
-        status=status.HTTP_201_CREATED,
-        content_type="application/json"
-    )
 
     # return HttpResponse(
     #     simplejson.dumps(graph['elements'], ignore_nan=True),    
