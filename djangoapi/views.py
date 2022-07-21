@@ -2,7 +2,7 @@ import time
 import os
 import uuid
 import simplejson
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseServerError
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 # from djangoapi.serializers import DocumentSerializer
@@ -165,6 +165,8 @@ def workflow(request):
     info = client.get_flow_run_info(flow_id)
     last_task = info.task_runs.pop()
     json_cyto_graphs = last_task.state.load_result(last_task.state._result).result
+    if json_cyto_graphs is None:
+        return HttpResponseServerError()
 
     print(dir(json_cyto_graphs))
     print(len(json_cyto_graphs))
