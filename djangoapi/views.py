@@ -175,7 +175,7 @@ def workflow(request):
     file_paths = []
     for (index, graph) in enumerate(json_cyto_graphs):
         path = os.path.join(PATH_CURRENT, 'results', f'result_{file_id}_{index}.cyjs')
-        with open(path, 'wb+') as destination:
+        with open(path, 'w') as destination:
             destination.write(graph)
         file_paths.append(path)
 
