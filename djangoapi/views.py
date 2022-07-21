@@ -2,7 +2,7 @@ import time
 import os
 import uuid
 import simplejson
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from djangoapi.serializers import DocumentSerializer
@@ -82,17 +82,18 @@ def getFilesUser(request):
         file = {
             'id':document.id,
             'name': document.name.split('token_')[1],
-            'date_upload': document.uploaded_at.strftime('%d/%m/%Y %H:%M:%S')
+            'date_upload': document.uploaded_at.strftime('%d/%m/%Y %H:%M:%S'),
+            'has_result': bool(document.result_path)
         }
         files.append(file)
 
     # breakpoint()
-
     return HttpResponse(
         simplejson.dumps({'files': files}),
         status=status.HTTP_200_OK,
         content_type="application/json"
     )
+
 
 @login_required
 @api_view(['GET'])
@@ -100,49 +101,77 @@ def deleteFileUser(request):
     error = False
     try:
         idFile = int(request.GET["id"])
-        Document.objects.filter(id=idFile).delete()   
+        Document.objects.filter(id=idFile).delete()
     except Exception:    
         error=True
 
-    return HttpResponse(                
+    return HttpResponse(
         simplejson.dumps({'error': error}),
         status=status.HTTP_200_OK,
         content_type="application/json"
     )
 
+
+@login_required
+@api_view(['GET'])
+def downloadResult(request):
+    file_id = int(request.GET.get('id'))
+    file = Document.objects.filter(id=file_id, user=request.user).first()
+
+    if file is None:
+        return HttpResponseForbidden()
+
+    if os.path.exists(file.result_path):
+        with open(file.result_path, 'rb') as rp:
+            response = HttpResponse(rp.read(), content_type='application/x-zip-compressed')
+            response['Content-Disposition'] = f'inline; filename=result_{file.id}'
+            return response
+    
+    return HttpResponseNotFound()
+
+
 @login_required
 @api_view(['POST'])
 def workflow(request):
-    tokenFile = int(request.data.get('tokenFile'))
-    pathFile = Document.objects.filter(id=tokenFile).values_list('path', flat=True).first()
-
+    # obtém o arquivo pelo id
+    file_id = int(request.POST.get('id'))
+    file = Document.objects.filter(id=file_id).first()
+    print(file_id)
     # print(request)
     # document = JSONParser().parse(request)
 
-    '''
+    # inicializa o workflow
     graph_building = StartFlowRun(
         flow_name="graph_building",
         project_name="sgwfc-gene",
         wait=False
     )
-
     with Flow("Call Flow") as flow:
-        end_flow = graph_building(parameters=dict(gene_filename=pathFile))
+        end_flow = graph_building(parameters=dict(gene_filename=file.path))
         # end_flow = graph_building(parameters=dict(gene_filename='/input/base_wgcna.csv'))
+
+    # executa o workflow
     state = flow.run()
     flow_id = state.result[end_flow].result
     client = Client()
 
+    # espera o workflow terminar
     while not client.get_flow_run_info(flow_id).state.is_finished():
         time.sleep(5)
+
+    # obtém o resultado da execução do workflow
     info = client.get_flow_run_info(flow_id)
     last_task = info.task_runs.pop()
     graph = last_task.state.load_result(last_task.state._result).result
-    breakpoint()  
-    '''
-    g = pickle.load(open('file.pkl','rb'))
-    G = networkx.path_graph(g)
-    graph = networkx.cytoscape_data(G)
+    # breakpoint()
+
+    
+    print(dir(graph))
+
+    # salva o resultado
+    # g = pickle.load(open('file.pkl','rb'))
+    # G = networkx.path_graph(g)
+    # graph = networkx.cytoscape_data(G)
 
     # bb = networkx.betweenness_centrality(G)
     # networkx.set_node_attributes(G, bb, "betweenness")

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react'
 import './index.less'
 import Util from '../../util'
 import {useDispatch} from 'react-redux'
-import { connect } from 'react-redux'
-//import { useTable } from 'react-table'
 
 const FilesUser = () => {
   
@@ -16,9 +14,30 @@ const FilesUser = () => {
   const runWorkflow = (event) => {
     //$('.filesUser--wrapper').hide();
     var id = $(event.target).closest('tr').attr('data-key');
-    dispatch({type:'RUN', value:id})
-    console.log(id);
-    //alert(id);
+
+    console.log('Running: ' + id);
+    const requestData = {'id': id};
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify(requestData),
+      headers: new Headers({
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      })
+    }
+
+    fetch('/api/workflow/', requestOptions)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          console.log('Finished running: ' + id);
+          window.location.reload();
+        },
+        (error) => {
+          setError(error);
+        }
+      )
+
     //passar id para uma funcao do componente do cytoscape. Lá ele vai receber o id fazer uma request para o back e pegar o arquivo e rodar o workflow e mostrar o resultado na tela
   }
 
@@ -62,6 +81,18 @@ const FilesUser = () => {
         'X-CSRFToken': csrftoken
       })
     }
+
+    console.log('Downloading result from file: ' + id);
+    fetch('/api/downloadResult?id=' + id, requestOptions)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          console.log('Download complete');
+        },
+        (error) => {
+          setError(error);
+        }
+      )
   }
 
   useEffect(() => {
@@ -112,7 +143,9 @@ const FilesUser = () => {
                 <td>{item.date_upload}</td>
                 <td><a href="#" onClick={runWorkflow}>Run</a></td>
                 <td><a href="#" onClick={deleteFile}>Delete</a></td>
-                <td><a href="#" onClick={downloadResult}>Download</a></td>
+                <td>{ item.has_result &&
+                  <a href="#" onClick={downloadResult}>Download</a>
+                }</td>
               </tr>
             ))
           }
