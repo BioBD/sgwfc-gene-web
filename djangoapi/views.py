@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFoun
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 # from djangoapi.serializers import DocumentSerializer
-from djangoapi.models import Document
+from djangoapi.models import Document, Result
 from prefect import Flow, Client
 from prefect.tasks.prefect import StartFlowRun
 from rest_framework import status  # , viewsets
@@ -14,6 +14,7 @@ from rest_framework.decorators import api_view
 # from rest_framework.parsers import JSONParser 
 from django.contrib.auth.models import User
 from zipfile import ZipFile
+import json
 # import pickle
 # import networkx
 # import datetime
@@ -84,7 +85,7 @@ def getFilesUser(request):
             'id':document.id,
             'name': document.name.split('token_')[1],
             'date_upload': document.uploaded_at.strftime('%d/%m/%Y %H:%M:%S'),
-            'has_result': bool(document.result_path)
+            'has_result': bool(document.result_set.all())
         }
         files.append(file)
 
@@ -117,19 +118,34 @@ def deleteFileUser(request):
 @api_view(['GET'])
 def downloadResult(request):
     file_id = int(request.GET.get('id'))
-    file = Document.objects.filter(id=file_id, user=request.user).first()
+    results = Result.objects.filter(document_id=file_id).all()
 
-    if file is None:
-        return HttpResponseForbidden()
+    if not results:
+        return HttpResponseNotFound()
 
-    if os.path.exists(file.result_path):
-        with open(file.result_path, 'rb') as rp:
+    # cria arquivos separados para cada resultado
+    file_paths = []
+    for (index, result) in enumerate(results):
+        path = os.path.join(PATH_CURRENT, 'results', f'result_{file_id}_{index}.cyjs')
+        with open(path, 'w') as destination:
+            destination.write(result.result_json)
+        file_paths.append(path)
+
+    # cria um zip dos arquivos e remove os arquivos criados
+    zip_path = os.path.join(PATH_CURRENT, 'results', f'result_{file_id}.zip')
+    zip_file = ZipFile(zip_path, 'w')
+    for file_path in file_paths:
+        zip_file.write(file_path)
+        os.remove(file_path)
+    zip_file.close()
+
+    if os.path.exists(zip_path):
+        with open(zip_path, 'rb') as rp:
             response = HttpResponse(rp.read())
             response['Content-Type'] = 'application/x-zip-compressed'
-            response['Content-Disposition'] = 'attachment; filename=result_' + str(file.id) + '.zip'
+            response['Content-Disposition'] = 'attachment; filename=result_' + str(file_id) + '.zip'
             return response
-
-    return HttpResponseNotFound()
+    return HttpResponseServerError()
 
 
 @login_required
@@ -164,33 +180,19 @@ def workflow(request):
     # obtém o resultado da execução do workflow
     info = client.get_flow_run_info(flow_id)
     last_task = info.task_runs.pop()
-    json_cyto_graphs = last_task.state.load_result(last_task.state._result).result
-    if json_cyto_graphs is None:
+    cyto_graph_dicts = last_task.state.load_result(last_task.state._result).result
+    if not cyto_graph_dicts:
         return HttpResponseServerError()
 
-    print(dir(json_cyto_graphs))
-    print(len(json_cyto_graphs))
+    # salva o resultado no banco como JSON
+    for graph_dict in cyto_graph_dicts:
+        result = Result(
+            result_json = json.dumps(graph_dict),
+            document=file
+        )
+        result.save()
 
-    # salva o resultado em arquivos separados
-    file_paths = []
-    for (index, graph) in enumerate(json_cyto_graphs):
-        path = os.path.join(PATH_CURRENT, 'results', f'result_{file_id}_{index}.cyjs')
-        with open(path, 'w') as destination:
-            destination.write(graph)
-        file_paths.append(path)
-
-    # cria um zip dos arquivos e remove os arquivos criados
-    zip_path = os.path.join(PATH_CURRENT, 'results', f'result_{file_id}.zip')
-    zip_file = ZipFile(zip_path, 'w')
-    for file_path in file_paths:
-        zip_file.write(file_path)
-        os.remove(file_path)
-    zip_file.close()
-
-    # salva a path do resultado no banco
-    file.result_path = zip_path
-
-    # retorna uma resposta indicando que os arquivos estão disponíveis
+    # retorna uma resposta indicando que o resultado está disponível
     return HttpResponse(
         simplejson.dumps({}),
         status=status.HTTP_201_CREATED,
