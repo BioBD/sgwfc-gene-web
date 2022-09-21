@@ -2,7 +2,7 @@
 Web based workflow for sgwf
 
 ## Install
-This project needs Node 12+ and Python 3.5+
+This project needs Node 12+ and Python 3.8+
 
 ### NVM install
 
@@ -20,7 +20,7 @@ to use project node version
 
 ### Dependencies
 
-Inside Python 3.5+ virtualenv
+Inside Python 3.8+ virtualenv
 
 ```
 make install
