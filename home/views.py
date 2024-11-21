@@ -9,3 +9,8 @@ def home(request):
 def about(request):
     """Função da View para página Sobre"""
     return render(request, 'home/about.html')
+
+
+def drugstone(request):
+    """Função da View para página Home"""
+    return render(request, 'front-end/drugstone.html')
