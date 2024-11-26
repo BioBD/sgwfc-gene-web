@@ -15,3 +15,4 @@ class Document(models.Model):
 class Result(models.Model):
     result_json = models.TextField()
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
+    path = models.CharField(max_length=200,null=True)  
